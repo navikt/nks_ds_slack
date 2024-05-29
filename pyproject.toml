@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "nks-ds-slackbot"
+version = "0.1.0"
+description = "Slack bot for NKS Digital Assistent"
+authors = ["Jørgen Nordmoen <jorgen@nordmoen.net>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic-settings = "^2.2.1"
+slack-bolt = "^1.18.1"
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
