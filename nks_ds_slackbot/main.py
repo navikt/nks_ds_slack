@@ -14,10 +14,11 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk import WebClient
 
 from .settings import Settings
-from .utils import convert_msg, filter_msg
+from .utils import convert_msg, filter_msg, is_alive
 
 # Hent innstillinger
 settings = Settings()
+api_url = httpx.URL(str(settings.endpoint))
 
 # Set opp logging med Slack
 logging.basicConfig(level=logging.INFO)
@@ -44,23 +45,16 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         client.chat_update, channel=temp_msg.data["channel"], ts=temp_msg.data["ts"]
     )
     # Sjekk tidlig om API-et kjører, slik at bruker slipper å vente
-    api_url = httpx.URL(str(settings.endpoint)).copy_with(path="/is_alive")
-    try:
-        reply = httpx.get(api_url)
-        if reply.status_code != 200:
-            update_msg(text="NKS DS kjører ikke akkurat nå :wrench:")
-            return
-    except httpx.ReadTimeout:
-        update_msg(text="NKS DS kjører ikke akkurat nå :wrench:")
+    if not is_alive(api_url):
+        update_msg(text="Kunnskapsbasen kjører ikke akkurat nå :wrench:")
         return
     # Hent ut chat historikk og spørsmål fra brukeren
     history = [convert_msg(msg) for msg in chat_hist.data["messages"][:-1]]
     question = filter_msg(chat_hist.data["messages"][-1]["text"])
     # Send spørsmål til NKS DS API
-    api_url = httpx.URL(str(settings.endpoint)).copy_with(path="/chat")
     try:
         reply = httpx.post(
-            api_url,
+            api_url.copy_with(path="/chat"),
             json={"history": history, "question": question},
             timeout=60.0,
         )
