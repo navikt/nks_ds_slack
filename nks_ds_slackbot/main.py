@@ -4,6 +4,8 @@
 Slack bot for NKS Digital Assistent
 """
 
+import functools
+import json
 import logging
 
 import httpx
@@ -35,6 +37,12 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         channel=event["channel"],
         thread_ts=event["ts"],
     )
+    # Lag en funksjon som kan brukes for å endre svar, dette gjør det enklere å
+    # ha komplekse funksjoner senere som bruker både 'text' og 'blocks' for å
+    # svare
+    update_msg = functools.partial(
+        client.chat_update, channel=temp_msg.data["channel"], ts=temp_msg.data["ts"]
+    )
     # Hent ut chat historikk og spørsmål fra brukeren
     history = [convert_msg(msg) for msg in chat_hist.data["messages"][:-1]]
     question = filter_msg(chat_hist.data["messages"][-1]["text"])
@@ -47,17 +55,17 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
             timeout=60.0,
         )
         # Når vi har et svar oppdaterer vi den første meldingen
-        text = reply.text
+        text = json.loads(reply.text)
         if reply.status_code != 200:
-            text = "Ånei! Noe gikk galt :thinking_face:"
+            app.logger.error("Mottok status %s og tekst %s", reply.status_code, text)
+            update_msg(text="Ånei! Noe gikk galt :thinking_face:")
+            return
     except httpx.ReadTimeout:
         app.logger.error("Spørring mot kunnskapbasen tok for lang tid!")
-        text = "Kunnskapsbasen svarer ikke :shrug:"
-    client.chat_update(
-        channel=temp_msg.data["channel"],
-        ts=temp_msg.data["ts"],
-        text=text,
-    )
+        update_msg(text="Kunnskapsbasen svarer ikke :shrug:")
+    # Hvis vi kommer ned hit så vet vi at systemet svarte på spørsmålet som
+    # forventet
+    update_msg(text=text)
 
 
 @app.event("app_mention")  # type: ignore[misc]
