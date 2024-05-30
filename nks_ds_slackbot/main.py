@@ -43,6 +43,16 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
     update_msg = functools.partial(
         client.chat_update, channel=temp_msg.data["channel"], ts=temp_msg.data["ts"]
     )
+    # Sjekk tidlig om API-et kjører, slik at bruker slipper å vente
+    api_url = httpx.URL(str(settings.endpoint)).copy_with(path="/is_alive")
+    try:
+        reply = httpx.get(api_url)
+        if reply.status_code != 200:
+            update_msg(text="NKS DS kjører ikke akkurat nå :wrench:")
+            return
+    except httpx.ReadTimeout:
+        update_msg(text="NKS DS kjører ikke akkurat nå :wrench:")
+        return
     # Hent ut chat historikk og spørsmål fra brukeren
     history = [convert_msg(msg) for msg in chat_hist.data["messages"][:-1]]
     question = filter_msg(chat_hist.data["messages"][-1]["text"])
