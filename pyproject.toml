@@ -8,8 +8,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic-settings = "^2.2.1"
-slack-bolt = "^1.18.1"
+httpx = "^0.27.0"  # Brukes for GET/POST mot NKS-DS-API
+pydantic-settings = "^2.2.1"  # Brukes for miljøvariabler
+slack-bolt = "^1.18.1"  # Brukes for å snakke med Slack
 
 [tool.mypy]
 strict = true
