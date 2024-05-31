@@ -1,0 +1,22 @@
+name: CI
+on:
+    push:
+        branches: [main]
+    pull_request:
+    workflow_dispatch:
+        # Tillat at man manuelt starter jobber på Github
+env:
+    FORCE_COLOR: "1"
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.12"
+            - name: Install nox
+              run: python3 -m pip install --disable-pip-version-check nox
+            - name: Lint
+              run: nox --non-interactive --error-on-missing-interpreter --session "lint"
