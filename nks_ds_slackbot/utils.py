@@ -8,13 +8,19 @@ import re
 
 import httpx
 
+USERNAME_PATTERN: re.Pattern[str] = re.compile(r"<@([A-Z0-9]+)>")
+"""Mønster for å kjenne igjen Slack brukernavn"""
+
+EMOJI_PATTERN: re.Pattern[str] = re.compile(r":([a-zA-Z0-9_-]+):")
+"""Mønster for å kjenne igjen Slack emoji"""
+
 
 def filter_msg(msg: str) -> str:
     """Filtrer ut tekst i meldingen som vi ikke ønsker å sende til NKS DS API"""
     # Filtrer ut Slack emoji
-    msg = re.sub(r":[a-zA-Z0-9_-]+:", "", msg)
+    msg = re.sub(EMOJI_PATTERN, "", msg)
     # Filtrer ut '@bruker' strenger
-    msg = re.sub(r"<@[A-Z0-9]+>", "", msg)
+    msg = re.sub(USERNAME_PATTERN, "", msg)
     # Vi kjører 'strip' tilslutt slik at vi eventuelt fjerner mellomrom som
     # oppstår fordi vi har fjernet tekst
     return msg.strip()
