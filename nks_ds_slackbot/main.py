@@ -85,7 +85,7 @@ def slack_mention(event: dict[str, str], client: WebClient) -> None:
     chat(client, event)
 
 
-@app.event("message")
+@app.event("message")  # type: ignore[misc]
 def thread_reply(event: dict[str, str], client: WebClient) -> None:
     """Håndter svar i tråder boten har besvart"""
     # Sjekk at meldingen er et svar i en tråd
@@ -121,7 +121,7 @@ def thread_reply(event: dict[str, str], client: WebClient) -> None:
     chat(client, event)
 
 
-@app.event("member_joined_channel")
+@app.event("member_joined_channel")  # type: ignore[misc]
 def greet(event: dict[str, str], say: Say, client: WebClient) -> None:
     """Når boten blir invitert så sier den hyggelig 'Hei'"""
     user = client.users_info(user=event["user"])
