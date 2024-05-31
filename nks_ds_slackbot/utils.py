@@ -28,11 +28,13 @@ def convert_msg(slack_msg: dict[str, str]) -> dict[str, str]:
     result["content"] = filter_msg(slack_msg["text"])
     return result
 
+
 def is_alive(url: httpx.URL) -> bool:
     """Sjekk om NKS DS API er i live/oppe"""
     api_url = url.copy_with(path="/is_alive")
     try:
         reply = httpx.get(api_url)
-        return reply.status_code == 200
+        result: bool = reply.status_code == 200
+        return result
     except httpx.ReadTimeout:
         return False

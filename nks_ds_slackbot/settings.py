@@ -8,7 +8,7 @@ from pydantic import AliasChoices, Field, HttpUrl, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore[misc]
     """Innstillinger for NKS DS Slack bot"""
 
     model_config = SettingsConfigDict(
