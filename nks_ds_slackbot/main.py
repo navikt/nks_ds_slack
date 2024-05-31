@@ -7,6 +7,7 @@ Slack bot for NKS Digital Assistent
 import functools
 import json
 import logging
+import re
 
 import httpx
 from slack_bolt import App, Say
@@ -14,7 +15,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk import WebClient
 
 from .settings import Settings
-from .utils import convert_msg, filter_msg, is_alive
+from .utils import USERNAME_PATTERN, convert_msg, filter_msg, is_alive
 
 # Hent innstillinger
 settings = Settings()
@@ -104,6 +105,13 @@ def thread_reply(event: dict[str, str], client: WebClient) -> None:
     )
     if not we_replied:
         return
+    # Det siste vi sjekker er om meldingen inneholder en '@bot' til oss, slike
+    # meldinger blir besvart av 'slack_mention' over og hvis vi ikke stopper
+    # prosessering her blir det to svar i tråden
+    for username in re.findall(USERNAME_PATTERN, event["text"]):
+        user = client.users_info(user=username)
+        if user.data["user"]["profile"].get("api_app_id") == settings.id:
+            return
     app.logger.info(
         "Svar i tråd %s (kanal: %s), fra bruker %s",
         event["ts"],
