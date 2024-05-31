@@ -50,7 +50,7 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         return
     # Hent ut chat historikk og spørsmål fra brukeren
     history = [convert_msg(msg) for msg in chat_hist.data["messages"][:-1]]
-    question = filter_msg(chat_hist.data["messages"][-1]["text"])
+    question = filter_msg(event["text"])
     # Send spørsmål til NKS DS API
     try:
         reply = httpx.post(
