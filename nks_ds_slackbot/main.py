@@ -127,7 +127,7 @@ def greet(event: dict[str, str], say: Say, client: WebClient) -> None:
     user = client.users_info(user=event["user"])
     if (
         "api_app_id" not in user.data["user"]["profile"]
-        and user.data["user"]["profile"]["api_app_id"] != settings.id
+        or user.data["user"]["profile"]["api_app_id"] != settings.id
     ):
         return
     app.logger.info(
