@@ -35,7 +35,7 @@ def convert_msg(slack_msg: dict[str, str]) -> dict[str, str]:
     return result
 
 
-def is_alive(url: httpx.URL) -> bool:
+def is_bob_alive(url: httpx.URL) -> bool:
     """Sjekk om NKS DS API er i live/oppe"""
     api_url = url.copy_with(path="/is_alive")
     try:

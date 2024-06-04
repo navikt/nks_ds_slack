@@ -14,7 +14,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk import WebClient
 
 from .settings import Settings
-from .utils import USERNAME_PATTERN, convert_msg, filter_msg, is_alive
+from .utils import USERNAME_PATTERN, convert_msg, filter_msg, is_bob_alive
 
 # Hent innstillinger
 settings = Settings()
@@ -45,7 +45,7 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         client.chat_update, channel=temp_msg.data["channel"], ts=temp_msg.data["ts"]
     )
     # Sjekk tidlig om API-et kjører, slik at bruker slipper å vente
-    if not is_alive(api_url):
+    if not is_bob_alive(api_url):
         update_msg(text="Kunnskapsbasen kjører ikke akkurat nå :wrench:")
         return
     # Hent ut chat historikk og spørsmål fra brukeren
