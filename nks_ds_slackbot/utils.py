@@ -14,6 +14,12 @@ USERNAME_PATTERN: re.Pattern[str] = re.compile(r"<@([A-Z0-9]+)>")
 EMOJI_PATTERN: re.Pattern[str] = re.compile(r":([a-zA-Z0-9_-]+):")
 """Mønster for å kjenne igjen Slack emoji"""
 
+QUOTE_PATTERN: re.Pattern[str] = re.compile(r"^>(.*)")
+"""Mønster for å kjenne igjen et Slack sitat"""
+
+QUOTE_LINK_PATTERN: re.Pattern[str] = re.compile(r"\(_(.*)_\)")
+"""Mønster for å kjenne igjen en Slack sitat forklaring/lenke"""
+
 
 def strip_msg(msg: str) -> str:
     """Filtrer ut tekst i meldingen som vi ikke ønsker å sende til NKS DS API"""
@@ -21,6 +27,10 @@ def strip_msg(msg: str) -> str:
     msg = re.sub(EMOJI_PATTERN, "", msg)
     # Filtrer ut '@bruker' strenger
     msg = re.sub(USERNAME_PATTERN, "", msg)
+    # Filtrer ut sitater
+    msg = re.sub(QUOTE_PATTERN, "", msg)
+    # Filtrer ut lenke til sitater
+    msg = re.sub(QUOTE_LINK_PATTERN, "", msg)
     # Vi kjører 'strip' tilslutt slik at vi eventuelt fjerner mellomrom som
     # oppstår fordi vi har fjernet tekst
     return msg.strip()
