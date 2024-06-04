@@ -60,7 +60,9 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         )
         if reply.status_code != 200:
             app.logger.error(
-                "Mottok status %s og begrunnelse %s", reply.status_code, reply.reason_phrase
+                "Mottok status %s og begrunnelse %s",
+                reply.status_code,
+                reply.reason_phrase,
             )
             update_msg(text="Ånei! Noe gikk galt for kunnskapsbasen :scream:")
             return
