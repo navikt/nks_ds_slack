@@ -14,7 +14,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_sdk import WebClient
 
 from .settings import Settings
-from .utils import USERNAME_PATTERN, convert_msg, filter_msg, is_bob_alive
+from .utils import USERNAME_PATTERN, convert_msg, is_bob_alive, strip_msg
 
 # Hent innstillinger
 settings = Settings()
@@ -50,7 +50,7 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         return
     # Hent ut chat historikk og spørsmål fra brukeren
     history = [convert_msg(msg) for msg in chat_hist.data["messages"][:-1]]
-    question = filter_msg(event["text"])
+    question = strip_msg(event["text"])
     # Send spørsmål til NKS DS API
     try:
         reply = httpx.post(

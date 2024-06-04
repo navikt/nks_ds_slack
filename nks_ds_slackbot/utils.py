@@ -15,7 +15,7 @@ EMOJI_PATTERN: re.Pattern[str] = re.compile(r":([a-zA-Z0-9_-]+):")
 """Mønster for å kjenne igjen Slack emoji"""
 
 
-def filter_msg(msg: str) -> str:
+def strip_msg(msg: str) -> str:
     """Filtrer ut tekst i meldingen som vi ikke ønsker å sende til NKS DS API"""
     # Filtrer ut Slack emoji
     msg = re.sub(EMOJI_PATTERN, "", msg)
@@ -31,7 +31,7 @@ def convert_msg(slack_msg: dict[str, str]) -> dict[str, str]:
     format"""
     result: dict[str, str] = {}
     result["role"] = "ai" if "app_id" in slack_msg else "human"
-    result["content"] = filter_msg(slack_msg["text"])
+    result["content"] = strip_msg(slack_msg["text"])
     return result
 
 
