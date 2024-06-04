@@ -32,3 +32,6 @@ class Settings(BaseSettings):  # type: ignore[misc]
 
     endpoint: HttpUrl
     """Endepunkt for NKS DS API"""
+
+    answer_timeout: float = 60.0
+    """Tidsbegrensning, i sekunder, på hvor lenge vi venter på et svar fra modellen før vi gir opp"""

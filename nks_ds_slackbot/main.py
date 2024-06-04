@@ -57,7 +57,7 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         reply = httpx.post(
             api_url.copy_with(path="/chat"),
             json={"history": history, "question": question},
-            timeout=60.0,
+            timeout=settings.answer_timeout,
         )
         # Når vi har et svar oppdaterer vi den første meldingen
         text = json.loads(reply.text)
@@ -66,8 +66,12 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
             update_msg(text="Ånei! Noe gikk galt :thinking_face:")
             return
     except httpx.ReadTimeout:
-        app.logger.error("Spørring mot kunnskapbasen tok for lang tid!")
+        app.logger.error(
+            "Spørring mot kunnskapbasen tok for lang tid, ventet %.1f sekunder!",
+            settings.answer_timeout,
+        )
         update_msg(text="Kunnskapsbasen svarer ikke :shrug:")
+        return
     # Hvis vi kommer ned hit så vet vi at systemet svarte på spørsmålet som
     # forventet
     update_msg(text=text)
