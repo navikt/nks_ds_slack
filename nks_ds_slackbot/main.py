@@ -5,7 +5,6 @@ Slack bot for NKS Digital Assistent
 """
 
 import functools
-import json
 import logging
 import re
 
@@ -59,8 +58,6 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
             json={"history": history, "question": question},
             timeout=settings.answer_timeout,
         )
-        # Når vi har et svar oppdaterer vi den første meldingen
-        text = json.loads(reply.text)
         if reply.status_code != 200:
             app.logger.error(
                 "Mottok status %s og begrunnelse %s", reply.status_code, reply.reason_phrase
@@ -74,6 +71,19 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         )
         update_msg(text="Kunnskapsbasen svarer ikke :shrug:")
         return
+    data = reply.json()
+    context = {}
+    for cont in data["context"]:
+        context[cont["article_id"]] = cont
+    cites = "\n\n".join(
+        [
+            f"> {cite['text']}\n"
+            f"(_{context[cite['article_id']]['title']}_ / "
+            f"_{cite['section']}_)"
+            for cite in data["quotes"]
+        ]
+    )
+    text = f"{data['answer']}\n{cites}"
     # Hvis vi kommer ned hit så vet vi at systemet svarte på spørsmålet som
     # forventet
     update_msg(text=text)
