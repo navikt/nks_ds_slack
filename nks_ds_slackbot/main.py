@@ -80,8 +80,8 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
     cites = "\n\n".join(
         [
             f"> {cite['text']}\n"
-            f"(_{context[cite['article_id']]['title'] or 'Fant ikke tittel'}_ / "
-            f"_{cite['section'] or 'Fant ikke seksjon'}_)"
+            f"(_{context[cite['article_id']]['title'] or 'Uten tittel'}_ / "
+            f"_{cite['section'] or 'Uten seksjon'}_)"
             for cite in data["quotes"]
         ]
     )
