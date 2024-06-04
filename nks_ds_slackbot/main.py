@@ -62,8 +62,10 @@ def chat(client: WebClient, event: dict[str, str]) -> None:
         # Når vi har et svar oppdaterer vi den første meldingen
         text = json.loads(reply.text)
         if reply.status_code != 200:
-            app.logger.error("Mottok status %s og tekst %s", reply.status_code, text)
-            update_msg(text="Ånei! Noe gikk galt :thinking_face:")
+            app.logger.error(
+                "Mottok status %s og begrunnelse %s", reply.status_code, reply.reason_phrase
+            )
+            update_msg(text="Ånei! Noe gikk galt for kunnskapsbasen :scream:")
             return
     except httpx.ReadTimeout:
         app.logger.error(
